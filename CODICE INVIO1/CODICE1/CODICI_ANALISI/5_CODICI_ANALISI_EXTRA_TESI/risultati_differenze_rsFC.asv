@@ -1,0 +1,766 @@
+close all
+clear all
+clc
+
+disp_f = 4;
+
+% rng(100)
+% rng("default")
+
+%% SETTING OF FOLDER PATH 
+%E:\PadovaPostDoc\Giacomo_Gdrive_Download\CODICE INVIO
+
+base_path = pwd;
+data_path_cgm = fullfile(base_path,'DATI','CGM_INTERP');
+rsFC_results  = fullfile("RISULTATI DEFINITIVI/rsFC/");
+cgm_results_path = fullfile(base_path,'RISULTATI DEFINITIVI/CGM_METRICS');
+function_path = fullfile(base_path,'CODICE','FUNCTION');
+dati_ext_disc = fullfile('E:\DATI');
+
+addpath(genpath(pwd))
+addpath(genpath(data_path_cgm))
+addpath(genpath(rsFC_results))
+addpath(genpath(function_path))
+addpath(genpath(dati_ext_disc))
+addpath(genpath(cgm_results_path))
+
+%% Load of rsFC results
+%% Step 1 - get group avg R
+% PD : [4;5;8;9;11;14;15;19;47]
+% For each PD load of the rsFC results (first and last euglycemia), z-score
+% them, perform the difference on the upper triangular matrix and save them
+% into the first CCA variable.
+
+%idx_PD = [4;5;8;9;11;14;15;19;47];
+
+%label_active_nodes_sort_complete = ["F3 (Frontal left)", "Fz (Frontal center)", "F4 (Frontal right)", "C3 (Motor left)","Cz (Motor center)","C4 (Motor right)","P3 (Parietal left)","Pz (Parietal center)","P4 (Parietal right)"]';
+
+label_active_nodes_sort_complete = ["F3", "Fz", "F4", "C3","Cz","C4","P3","Pz","P4"]';
+
+idx_PD = [3;4;5;8;9;10;11;14;15;19;25;47];
+
+%guy code 20 03 25
+group_hbo_FC_first = zeros (9,9,12);
+group_hbo_FC_last = zeros (9,9,12);
+
+group_hbr_FC_first = zeros (9,9,12);
+group_hbr_FC_last = zeros (9,9,12);
+
+for i=1:size(idx_PD,1)
+    load("PD_"+num2str(idx_PD(i))+"_FIRST_rsFC.mat")
+    group_hbo_FC_first(:,:,i) = FC_struct.hbo_FC;
+    group_hbr_FC_first(:,:,i) = FC_struct.hbr_FC;
+
+    load("PD_"+num2str(idx_PD(i))+"_LAST_rsFC.mat")
+    group_hbo_FC_last(:,:,i) = FC_struct.hbo_FC;
+    group_hbr_FC_last(:,:,i) = FC_struct.hbr_FC;
+
+end
+
+%load labels
+
+avg_group_hbo_FC_first = mean(group_hbo_FC_first,3,"omitnan");
+avg_group_hbo_FC_last = mean(group_hbo_FC_last,3);
+
+avg_group_hbr_FC_first = mean(group_hbr_FC_first,3,"omitnan");
+avg_group_hbr_FC_last = mean(group_hbr_FC_last,3);
+
+fontsize_s1 = 14;
+
+figure;
+subplot(1,2,1)
+imagesc(avg_group_hbo_FC_first(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+cb = colorbar();
+title('Group avg R HbO First');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'R val','FontSize',fontsize_s1,'Rotation',270)
+subplot(1,2,2)
+imagesc(avg_group_hbo_FC_last(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+cb = colorbar();
+title('Group avg R HbO Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'R val','FontSize',fontsize_s1,'Rotation',270)
+
+
+figure;
+subplot(1,2,1)
+imagesc(avg_group_hbr_FC_first(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+cb = colorbar();
+title('Group avg R HbR First');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'R val','FontSize',fontsize_s1,'Rotation',270)
+subplot(1,2,2)
+imagesc(avg_group_hbr_FC_last(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+cb = colorbar();
+title('Group avg R HbR Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'R val','FontSize',fontsize_s1,'Rotation',270)
+
+
+
+%% Step 2 - get fisher Z
+
+    Z_avg_group_hbo_FC_first = atanh(avg_group_hbo_FC_first);
+    Z_avg_group_hbo_FC_last = atanh(avg_group_hbo_FC_last);
+
+    Z_avg_group_hbr_FC_first = atanh(avg_group_hbr_FC_first);
+    Z_avg_group_hbr_FC_last = atanh(avg_group_hbr_FC_last);
+
+figure;
+subplot(1,2,1)
+imagesc(Z_avg_group_hbo_FC_first(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+cb = colorbar();
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'Z val','FontSize',fontsize_s1,'Rotation',270)
+title('Group avg Z HbO First');
+subplot(1,2,2)
+imagesc(Z_avg_group_hbo_FC_last(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+cb = colorbar();;
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'Z val','FontSize',fontsize_s1,'Rotation',270)
+title('Group avg Z HbO Last');
+
+figure;
+subplot(1,2,1)
+imagesc(Z_avg_group_hbr_FC_first(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+cb = colorbar();
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'Z val','FontSize',fontsize_s1,'Rotation',270)
+title('Group avg Z HbR First');
+subplot(1,2,2)
+imagesc(Z_avg_group_hbr_FC_last(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+cb = colorbar();
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'Z val','FontSize',fontsize_s1,'Rotation',270)
+title('Group avg Z HbR Last');
+
+%% step 3 - t test for each ROI pair - T VAL on Z score across subjects across first to last window 
+
+%remove PD14 for these ttests
+%PD_not14 = logical([1;1;1;1;1;1;1;0;1;1;1;1]);
+%so re do mean without PD14
+%avg_group_hbo_FC_first = mean(group_hbo_FC_first(:,:,PD_not14),3);
+%avg_group_hbo_FC_last = mean(group_hbo_FC_last(:,:,PD_not14),3);
+
+%avg_group_hbr_FC_first = mean(group_hbr_FC_first(:,:,PD_not14),3);
+%avg_group_hbr_FC_last = mean(group_hbr_FC_last(:,:,PD_not14),3);
+
+%guy code 20 03 25
+group_hbo_FC_first = zeros (9,9,12);
+group_hbo_FC_last = zeros (9,9,12);
+
+group_hbr_FC_first = zeros (9,9,12);
+group_hbr_FC_last = zeros (9,9,12);
+
+for i=1:size(idx_PD,1)
+    load("PD_"+num2str(idx_PD(i))+"_FIRST_rsFC.mat")
+    group_hbo_FC_first(:,:,i) = FC_struct.hbo_FC;
+    group_hbr_FC_first(:,:,i) = FC_struct.hbr_FC;
+
+    load("PD_"+num2str(idx_PD(i))+"_LAST_rsFC.mat")
+    group_hbo_FC_last(:,:,i) = FC_struct.hbo_FC;
+    group_hbr_FC_last(:,:,i) = FC_struct.hbr_FC;
+
+end
+
+% group_hbo_FC_first = group_hbo_FC_first(:,:,PD_not14);
+% group_hbo_FC_last = group_hbo_FC_last(:,:,PD_not14);
+% 
+% group_hbr_FC_first = group_hbr_FC_first(:,:,PD_not14);
+% group_hbr_FC_last = group_hbr_FC_last(:,:,PD_not14);
+
+Z_group_hbo_FC_first = atanh(group_hbo_FC_first);
+Z_group_hbo_FC_last = atanh(group_hbo_FC_last);
+
+Z_group_hbr_FC_first = atanh(group_hbr_FC_first);
+Z_group_hbr_FC_last = atanh(group_hbr_FC_last);
+
+p_val_Z_hbo_FC = zeros(size(group_hbo_FC_first,1),size(group_hbo_FC_first,2));
+p_val_Z_hbr_FC = zeros(size(group_hbo_FC_first,1),size(group_hbo_FC_first,2));
+fdr_p_val_Z_hbo_FC = zeros(size(group_hbo_FC_first,1),size(group_hbo_FC_first,2));
+fdr_p_val_Z_hbr_FC = zeros(size(group_hbo_FC_first,1),size(group_hbo_FC_first,2));
+
+t_val_Z_hbo_FC = zeros(size(group_hbo_FC_first,1),size(group_hbo_FC_first,2));
+t_val_Z_hbr_FC = zeros(size(group_hbo_FC_first,1),size(group_hbo_FC_first,2));
+
+for i=1:size(Z_avg_group_hbo_FC_first,1)
+    for j=1:size(Z_avg_group_hbo_FC_first,1)
+        [h,p,ci,stats] =ttest2(Z_group_hbo_FC_first(i,j,:),Z_group_hbo_FC_last(i,j,:));
+        t_val_Z_hbo_FC(i,j) = stats.tstat;
+        p_val_Z_hbo_FC(i,j) = p;
+
+        [h,p,ci,stats] =ttest2(Z_group_hbr_FC_first(i,j,:),Z_group_hbr_FC_last(i,j,:));
+        t_val_Z_hbr_FC(i,j) = stats.tstat;
+        p_val_Z_hbr_FC(i,j) = p;
+    end
+end
+
+
+    [h, crit_p, adj_ci_cvrg, fdr_p_val_Z_hbo_FC] = fdr_bh( nonzeros(tril(p_val_Z_hbo_FC,-1))   );
+    [h, crit_p, adj_ci_cvrg, fdr_p_val_Z_hbr_FC] = fdr_bh( nonzeros(tril(p_val_Z_hbr_FC,-1))   );
+
+
+figure;
+subplot(1,2,1)
+imagesc(t_val_Z_hbo_FC(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+%cb = colorbar();
+title('T val Z HbO First to Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    %ylabel(cb,'T val','FontSize',fontsize_s1,'Rotation',270)
+subplot(1,2,2)
+imagesc(p_val_Z_hbo_FC(:,:,1));  % Visualize t-statistics for the first ROI pair%pre 240625
+%imagesc(fdr_p_val_Z_hbo_FC(:,:,1));  % Visualize t-statistics for the first ROI pair
+
+caxis([0 0.05]);
+%cb = colorbar('YTickLabel',{'0','0.01','0.02','0.03','0.04','0.05'}, ...
+%               'YTick', 0:0.01:0.05);
+title('FDR P val Z HbO First to Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    %ylabel(cb,'fdr p','FontSize',fontsize_s1,'Rotation',270)
+figure;
+subplot(1,2,1)
+imagesc(t_val_Z_hbr_FC(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-1 1]);
+%cb = colorbar();
+title('T val Z HbR First to Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    %ylabel(cb,'T val','FontSize',fontsize_s1,'Rotation',270)
+subplot(1,2,2)
+imagesc(p_val_Z_hbr_FC(:,:,1));  % Visualize t-statistics for the first
+%ROI pair%oldpre 240625
+%imagesc(fdr_p_val_Z_hbr_FC(:,:,1));  % Visualize t-statistics for the first ROI pair
+
+caxis([0 0.05]);
+%cb = colorbar('YTickLabel',{'0','0.01','0.02','0.03','0.04','0.05'}, ...
+%               'YTick', 0:0.01:0.05);
+title('FDR P val Z HbR First to Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    %ylabel(cb,'fdr p','FontSize',fontsize_s1,'Rotation',270)
+
+%% step 4 chat gpt - T VAL on Z score across subjects for First and last window seperataly
+% Assuming 'fisherZ' is a 3D matrix of size [num_subjects, num_ROIs, num_ROIs]
+% fisherZ(:,:,i) contains the Fisher's Z-transformed connectivity matrix for subject i
+% If you already have Fisher's Z matrices per subject, load them into 'fisherZ'
+
+fisherZ_hbo_FC_first = Z_group_hbo_FC_first;
+fisherZ_hbo_FC_last = Z_group_hbo_FC_last;
+fisherZ_hbr_FC_first = Z_group_hbr_FC_first;
+fisherZ_hbr_FC_last = Z_group_hbr_FC_last;
+
+
+num_subjects = size(fisherZ_hbo_FC_first, 3);  % Number of subjects
+num_subjects_noPD14 = size(fisherZ_hbo_FC_first, 3)-1;  % Number of subjects
+
+num_subjects_vect = zeros(size(fisherZ_hbo_FC_first,1), size(fisherZ_hbo_FC_first,2) );
+num_subjects_vect(:,:) = num_subjects;
+num_subjects_vect(1:2,:) = num_subjects_noPD14;
+num_subjects_vect(:,1:2) = num_subjects_noPD14;
+
+num_ROIs = size(fisherZ_hbo_FC_first, 2);      % Number of ROIs
+
+% Step 1: Compute the group average Fisher's Z (element-wise mean)
+%2023b omitmissing, 2021 omitnan
+group_FisherZ_hbo_FC_first = mean(fisherZ_hbo_FC_first, 3,"omitnan");  % [1, num_ROIs, num_ROIs] - mean over subjects
+group_FisherZ_hbo_FC_last = mean(fisherZ_hbo_FC_last, 3,"omitnan");  % [1, num_ROIs, num_ROIs] - mean over subjects
+group_FisherZ_hbr_FC_first = mean(fisherZ_hbr_FC_first, 3,"omitnan");  % [1, num_ROIs, num_ROIs] - mean over subjects
+group_FisherZ_hbr_FC_last = mean(fisherZ_hbr_FC_last, 3,"omitnan");  % [1, num_ROIs, num_ROIs] - mean over subjects
+
+% Step 2: Compute the standard deviation for each ROI pair across subjects
+std_FisherZ_hbo_FC_first = std(fisherZ_hbo_FC_first, 0, 3,"omitnan");  % [1, num_ROIs, num_ROIs] - std across subjects
+std_FisherZ_hbo_FC_last = std(fisherZ_hbo_FC_last, 0, 3,"omitnan");  % [1, num_ROIs, num_ROIs] - std across subjects
+std_FisherZ_hbr_FC_first = std(fisherZ_hbr_FC_first, 0, 3,"omitnan");  % [1, num_ROIs, num_ROIs] - std across subjects
+std_FisherZ_hbr_FC_last = std(fisherZ_hbr_FC_last, 0, 3,"omitnan");  % [1, num_ROIs, num_ROIs] - std across subjects
+
+% Step 3: Compute the standard error (SE) for each connectivity value
+SE_hbo_FC_first = std_FisherZ_hbo_FC_first ./ sqrt(num_subjects_vect);  % [1, num_ROIs, num_ROIs]
+SE_hbo_FC_last = std_FisherZ_hbo_FC_last / sqrt(num_subjects);  % [1, num_ROIs, num_ROIs]
+SE_hbr_FC_first = std_FisherZ_hbr_FC_first ./ sqrt(num_subjects_vect);  % [1, num_ROIs, num_ROIs]
+SE_hbr_FC_last = std_FisherZ_hbr_FC_last / sqrt(num_subjects);  % [1, num_ROIs, num_ROIs]
+
+% Step 4: Compute t-statistics (group average Fisher's Z divided by SE)
+t_stats_hbo_FC_first = group_FisherZ_hbo_FC_first ./ SE_hbo_FC_first;  % [1, num_ROIs, num_ROIs] - t-statistics
+t_stats_hbo_FC_last = group_FisherZ_hbo_FC_last ./ SE_hbo_FC_last;  % [1, num_ROIs, num_ROIs] - t-statistics
+t_stats_hbr_FC_first = group_FisherZ_hbr_FC_first ./ SE_hbr_FC_first;  % [1, num_ROIs, num_ROIs] - t-statistics
+t_stats_hbr_FC_last = group_FisherZ_hbr_FC_last ./ SE_hbr_FC_last;  % [1, num_ROIs, num_ROIs] - t-statistics
+
+
+% Step 5: (Optional) Perform statistical testing (e.g., p-values)
+% Compute p-values based on t-statistics and degrees of freedom (df = num_subjects - 1)
+df = num_subjects - 1;
+df_nopd14 = num_subjects_noPD14 - 1;
+
+p_values_hbo_FC_first = 2 * (1 - tcdf(abs(t_stats_hbo_FC_first), df));  % Two-tailed test
+p_values_hbo_FC_last = 2 * (1 - tcdf(abs(t_stats_hbo_FC_last), df));  % Two-tailed test
+p_values_hbr_FC_first = 2 * (1 - tcdf(abs(t_stats_hbr_FC_first), df));  % Two-tailed test
+p_values_hbr_FC_last = 2 * (1 - tcdf(abs(t_stats_hbr_FC_last), df));  % Two-tailed test
+
+%must change df, for PD14 df=12-1 and no PD14 df=11-1 ONLY for first
+p_values_hbo_FC_first(1:2,:) = 2 * (1 - tcdf(abs(t_stats_hbo_FC_first(1:2,:)), df_nopd14));  % Two-tailed test
+p_values_hbr_FC_first(:,1:2) = 2 * (1 - tcdf(abs(t_stats_hbr_FC_first(:,1:2)), df_nopd14));  % Two-tailed test
+
+% Step 6: (Optional) Correct for multiple comparisons (e.g., FDR or Bonferroni)
+% Example: FDR correction
+[~, ~, ~, p_fdr] = fdr_bh(p_values_hbo_FC_first(:), 0.05, 'pdep', 'yes');  % p_fdr will be a vector of p-values
+p_fdr_hbo_FC_first = reshape(p_fdr, size(p_values_hbo_FC_first));  % Reshape corrected p-values to the same shape
+
+[~, ~, ~, p_fdr] = fdr_bh(p_values_hbo_FC_last(:), 0.05, 'pdep', 'yes');  % p_fdr will be a vector of p-values
+p_fdr_hbo_FC_last = reshape(p_fdr, size(p_values_hbo_FC_last));  % Reshape corrected p-values to the same shape
+
+[~, ~, ~, p_fdr] = fdr_bh(p_values_hbr_FC_first(:), 0.05, 'pdep', 'yes');  % p_fdr will be a vector of p-values
+p_fdr_hbr_FC_first = reshape(p_fdr, size(p_values_hbr_FC_first));  % Reshape corrected p-values to the same shape
+
+[~, ~, ~, p_fdr] = fdr_bh(p_values_hbr_FC_last(:), 0.05, 'pdep', 'yes');  % p_fdr will be a vector of p-values
+p_fdr_hbr_FC_last = reshape(p_fdr, size(p_values_hbr_FC_last));  % Reshape corrected p-values to the same shape
+% Step 7: Visualize the t-statistics (example for visualization of one ROI pair)
+% figure;
+% imagesc(t_stats(:,:,1));  % Visualize t-statistics for the first ROI pair
+% colorbar;
+% title('t-statistics for ROI pair 1');
+cbar_lim_hbo_FC_first = max( [max(max(t_stats_hbo_FC_first)) abs(min(min(t_stats_hbo_FC_first)))] );
+cbar_lim_hbo_FC_last = max( [max(max(t_stats_hbo_FC_last)) abs(min(min(t_stats_hbo_FC_last)))] );
+cbar_lim_hbr_FC_first = max( [max(max(t_stats_hbr_FC_first)) abs(min(min(t_stats_hbr_FC_first)))] );
+cbar_lim_hbr_FC_last = max( [max(max(t_stats_hbr_FC_last)) abs(min(min(t_stats_hbr_FC_last)))] );
+cbar_lim = max([cbar_lim_hbo_FC_first cbar_lim_hbo_FC_last cbar_lim_hbr_FC_first  cbar_lim_hbr_FC_last  ]);
+
+figure;
+subplot(1,2,1)
+imagesc(t_stats_hbo_FC_first(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-cbar_lim cbar_lim]);
+cb = colorbar();
+title('T val Z HbO First');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'T val','FontSize',fontsize_s1,'Rotation',270)
+subplot(1,2,2)
+imagesc(p_fdr_hbo_FC_first(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([0 0.05]);
+cb = colorbar('YTickLabel',{'0','0.01','0.02','0.03','0.04','0.05'}, ...
+               'YTick', 0:0.01:0.05);
+title('FDR P val Z HbO First');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'fdr p','FontSize',fontsize_s1,'Rotation',270)
+    colormap spring
+
+figure;
+subplot(1,2,1)
+imagesc(t_stats_hbo_FC_last(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-cbar_lim cbar_lim]);
+cb = colorbar();
+title('T val Z HbO Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'T val','FontSize',fontsize_s1,'Rotation',270)
+subplot(1,2,2)
+imagesc(p_fdr_hbo_FC_last(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([0 0.05]);
+cb = colorbar('YTickLabel',{'0','0.01','0.02','0.03','0.04','0.05'}, ...
+               'YTick', 0:0.01:0.05);
+title('FDR P val Z HbO Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'fdr p','FontSize',fontsize_s1,'Rotation',270)
+    colormap spring
+
+figure;
+subplot(1,2,1)
+imagesc(t_stats_hbr_FC_first(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-cbar_lim cbar_lim]);
+cb = colorbar();
+title('T val Z HbR First');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'T val','FontSize',fontsize_s1,'Rotation',270)
+subplot(1,2,2)
+imagesc(p_fdr_hbr_FC_first(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([0 0.05]);
+cb = colorbar('YTickLabel',{'0','0.01','0.02','0.03','0.04','0.05'}, ...
+               'YTick', 0:0.01:0.05);
+title('FDR P val Z HbR First');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'fdr p','FontSize',fontsize_s1,'Rotation',270)
+    colormap spring
+
+figure;
+subplot(1,2,1)
+imagesc(t_stats_hbr_FC_last(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([-cbar_lim cbar_lim]);
+cb = colorbar();
+title('T val Z HbR Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'T val','FontSize',fontsize_s1,'Rotation',270)
+subplot(1,2,2)
+imagesc(p_fdr_hbr_FC_last(:,:,1));  % Visualize t-statistics for the first ROI pair
+caxis([0 0.05]);
+cb = colorbar('YTickLabel',{'0','0.01','0.02','0.03','0.04','0.05'}, ...
+               'YTick', 0:0.01:0.05);
+title('FDR P val Z HbR Last');
+    xticklabels = label_active_nodes_sort_complete;
+    xticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(xticklabels));
+    xtickangle(45);
+    set(gca, 'XTick', xticks, 'XTickLabel', xticklabels,'FontSize',fontsize_s1);
+    yticklabels = label_active_nodes_sort_complete;
+    yticks = linspace(1, size(avg_group_hbo_FC_last, 2), numel(yticklabels));
+    set(gca, 'YTick', yticks, 'YTickLabel', yticklabels,'FontSize',fontsize_s1);
+    axis square
+    ylabel(cb,'fdr p','FontSize',fontsize_s1,'Rotation',270)
+    colormap spring
+
+%%
+
+% idx_PD = 5;
+
+soglia_25 = 0.5;
+soglia_50 = 1;
+soglia_75 = 1.5;
+
+name_first = 'PD_%d_FIRST_rsFC.mat';
+name_last  = 'PD_%d_LAST_rsFC.mat';
+
+rsFC_hbo_metrics = [];
+rsFC_hbr_metrics = [];
+hbo_sig = [];
+count_tot_hbo = 0;
+count_tot_hbr_25 = 0;
+count_sig_hbo = 0;
+count_sig_hbr_25 = 0;
+
+sig_pd_hbo_25 = [];
+sig_pd_hbr_25 = [];
+sig_pd_hbo_50 = [];
+sig_pd_hbr_50 = [];
+sig_pd_hbo_75 = [];
+sig_pd_hbr_75 = [];
+
+for i = 1:1:length(idx_PD)
+    
+    curr_idx = idx_PD(i);
+
+    % First euglycemia rsFC
+    tmp_first_name = sprintf(name_first, curr_idx);
+    load(tmp_first_name)
+    disp(['LOAD : ',tmp_first_name])
+    disp(' ')
+    tmp_hbo_zFC_first = atanh(FC_struct.hbo_FC);
+    tmp_hbr_zFC_first = atanh(FC_struct.hbr_FC);
+    % tmp_hbo_zFC_first = zscore(FC_struct.hbo_FC);
+    % tmp_hbr_zFC_first = zscore(FC_struct.hbr_FC);
+
+    % Last Euglycemia interval
+    tmp_last_name = sprintf(name_last, curr_idx);
+    load(tmp_last_name)
+    disp(['LOAD : ',tmp_last_name])
+    disp(' ')
+    tmp_hbo_zFC_last = atanh(FC_struct.hbo_FC);
+    tmp_hbr_zFC_last = atanh(FC_struct.hbr_FC);
+    % tmp_hbo_zFC_last = zscore(FC_struct.hbo_FC);
+    % tmp_hbr_zFC_last = zscore(FC_struct.hbr_FC);
+
+    % Compute the difference between the last and first rsFC Z-Score matrix
+    tmp_hbo_diff_rsFC = abs(tmp_hbo_zFC_last-tmp_hbo_zFC_first);
+    tmp_hbr_diff_rsFC = abs(tmp_hbr_zFC_last-tmp_hbr_zFC_first);
+    count_sig_hbo_25 = 0;
+    count_sig_hbr_25 = 0;
+    count_sig_hbo_50 = 0;
+    count_sig_hbr_50 = 0;
+    count_sig_hbo_75 = 0;
+    count_sig_hbr_75 = 0;
+    for r =1:1:size(tmp_hbr_diff_rsFC,2)
+        for c = 1:1:size(tmp_hbr_diff_rsFC,2)
+            if tmp_hbo_diff_rsFC(r,c)>soglia_25
+                count_sig_hbo_25 = count_sig_hbo_25 + 1;
+            end
+
+            if tmp_hbo_diff_rsFC(r,c)>soglia_50
+                hbo_sig(r,c) = 1;
+                count_sig_hbo_50 = count_sig_hbo_50 + 1;
+            end
+
+             if tmp_hbo_diff_rsFC(r,c)>soglia_75
+                hbo_sig(r,c) = 1;
+                count_sig_hbo_75 = count_sig_hbo_75 + 1;
+            end           
+        end
+    end
+
+ sig_pd_hbo_25 = [sig_pd_hbo_25;count_sig_hbo_25];
+ sig_pd_hbo_50 = [sig_pd_hbo_50;count_sig_hbo_50];
+ sig_pd_hbo_75 = [sig_pd_hbo_75;count_sig_hbo_75];
+   
+     for r =1:1:size(tmp_hbr_diff_rsFC,2)
+        for c = 1:1:size(tmp_hbr_diff_rsFC,2)
+            if tmp_hbr_diff_rsFC(r,c)>soglia_25
+                hbr_sig(r,c) = 1;
+                count_sig_hbr_25 = count_sig_hbr_25 + 1;
+                count_tot_hbr_25 = count_tot_hbr_25 + 1;
+            else
+                hbr_sig(r,c) = 0;
+            end
+            
+            if tmp_hbr_diff_rsFC(r,c)>soglia_50
+                hbr_sig(r,c) = 1;
+                count_sig_hbr_50 = count_sig_hbr_50 + 1;
+            else
+                hbr_sig(r,c) = 0;
+            end
+            if tmp_hbr_diff_rsFC(r,c)>soglia_75
+                hbr_sig(r,c) = 1;
+                count_sig_hbr_75 = count_sig_hbr_75 + 1;
+            else
+                hbr_sig(r,c) = 0;
+            end
+        end
+     end 
+
+     sig_pd_hbr_25 = [sig_pd_hbr_25;count_sig_hbr_25];
+     sig_pd_hbr_50 = [sig_pd_hbr_50;count_sig_hbr_50];
+     sig_pd_hbr_75 = [sig_pd_hbr_75;count_sig_hbr_75];
+
+
+    if disp_f == 3
+        figure()
+        subplot(1,2,1)
+        imagesc(tmp_hbo_diff_rsFC)
+        axis square
+        colormap jet
+        caxis([0 1])
+        colorbar
+        title(['PD ',num2str(curr_idx),' - HbO DIF MATRIX'])
+        set(gca,'fontsize',12,'fontweight','bold')
+        
+        xticklabels = FC_struct.labels_short;
+        xticks = linspace(1, size(tmp_hbo_zFC_first, 2), numel(xticklabels));
+        xtickangle(45)
+        set(gca, 'XTick', xticks, 'XTickLabel', xticklabels);
+        yticklabels = FC_struct.labels_short;
+        yticks = linspace(1, size(tmp_hbo_zFC_first, 2), numel(yticklabels));
+        set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
+
+        subplot(1,2,2)
+        imagesc(tmp_hbr_diff_rsFC)
+        axis square
+        colormap jet
+        caxis([0 1])
+        colorbar
+        title(['PD ',num2str(curr_idx),' - HbR DIF MATRIX'])
+        set(gca,'fontsize',12,'fontweight','bold')
+        
+        xticklabels = FC_struct.labels_short;
+        xticks = linspace(1, size(tmp_hbo_zFC_first, 2), numel(xticklabels));
+        xtickangle(45)
+        set(gca, 'XTick', xticks, 'XTickLabel', xticklabels);
+        yticklabels = FC_struct.labels_short;
+        yticks = linspace(1, size(tmp_hbo_zFC_first, 2), numel(yticklabels));
+        set(gca, 'YTick', yticks, 'YTickLabel', yticklabels)
+    end
+
+end
+
+sig_pd_hbo_def_25 = sig_pd_hbo_25/2;
+sig_pd_hbr_def_25 = sig_pd_hbr_25/2;
+differenze_25 = table(idx_PD,sig_pd_hbo_def_25,sig_pd_hbr_def_25);
+
+sig_pd_hbo_def_50 = sig_pd_hbo_50/2;
+sig_pd_hbr_def_50 = sig_pd_hbr_50/2;
+differenze_50 = table(idx_PD,sig_pd_hbo_def_50,sig_pd_hbr_def_50);
+
+sig_pd_hbo_def_75 = sig_pd_hbo_75/2;
+sig_pd_hbr_def_75 = sig_pd_hbr_75/2;
+differenze_75 = table(idx_PD,sig_pd_hbo_def_75,sig_pd_hbr_def_75);
+
+disp('==========================')
+disp('HbO')
+disp(['Variazioni di segno (>|1|)',num2str(sum(sig_pd_hbo_def_25))])
+
+disp('HbR')
+disp(['Variazioni di segno (>|1|)',num2str(sum(sig_pd_hbr_def_25))])
+
+%%
+Y = [sig_pd_hbo_def_25]';
+A = zeros(1,18);
+X = {'PD4','PD5','PD8','PD9','PD11','PD14','PD15','PD19','PD47'}
+
+figure()
+set(gcf, 'Position', get(0, 'Screensize'));
+subplot(2,1,1)
+hB = bar([sig_pd_hbo_def_25,sig_pd_hbr_def_25],'FaceColor','flat')
+set(hB(1),'FaceColor',[0.6350 0.0780 0.1840])
+set(hB(2),'FaceColor',[0 0.4470 0.7410])
+
+hAx=gca;            % get a variable for the current axes handle
+hT=[];              % placeholder for text object handles
+for i=1:length(hB)  % iterate over number of bar objects
+  hT=[hT text(hB(i).XData+hB(i).XOffset,hB(i).YData,num2str(hB(i).YData.','%d'), ...
+                          'VerticalAlignment','bottom','horizontalalign','center','fontweight','bold')];
+end
+xticklabels(X)
+h=gca; h.XAxis.TickLength = [0 0];
+title('VARIAZIONE CORRELAZIONE MAGGIORE DEL 25%')
+ylabel('Conteggio')
+set(gca,'FontWeight','bold')
+
+hold on
+yline(36,'r--','LineWidth',2)
+legend('HbO','HbR','Coppie ROI')
+
+
+subplot(2,1,2)
+hB = bar([sig_pd_hbo_def_50,sig_pd_hbr_def_50])
+set(hB(1),'FaceColor',[0.6350 0.0780 0.1840])
+set(hB(2),'FaceColor',[0 0.4470 0.7410])
+
+hAx=gca;            % get a variable for the current axes handle
+hT=[];              % placeholder for text object handles
+for i=1:length(hB)  % iterate over number of bar objects
+  hT=[hT text(hB(i).XData+hB(i).XOffset,hB(i).YData,num2str(hB(i).YData.','%d'), ...
+                          'VerticalAlignment','bottom','horizontalalign','center','fontweight','bold')];
+end
+h=gca; h.XAxis.TickLength = [0 0];
+title('VARIAZIONE CORRELAZIONE MAGGIORE DEL 50% (CAMBIO SEGNO)')
+ylabel('Conteggio')
+set(gca,'FontWeight','bold')
+hold on
+yline(36,'r--','LineWidth',2)
+legend('HbO','HbR','Coppie ROI')
+xticklabels(X)
+
+% saveas(gcf,['VARIAZIONI_BAR_PLOT_ABS_RSfc.jpg'])
+% print('FIG_50_BAR_diff_segno_rsFC','-djpeg','-r600')
+
