@@ -1,0 +1,19 @@
+The following functions and toolboxes are required to be downloaded and kept in the 'functions' file.
+
+BrainNetViewer
+https://www.nitrc.org/projects/bnv/
+
+FDR_mathworks
+https://uk.mathworks.com/help/bioinfo/ref/mafdr.html
+
+HOMER 2
+https://www.nitrc.org/projects/homer2
+
+iso2mesh
+https://github.com/fangq/iso2mesh
+
+NIRFAST-9.1
+https://github.com/nirfast-admin/NIRFAST
+
+NIRFASTer-2.0
+https://github.com/nirfaster/NIRFASTer
